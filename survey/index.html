@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ревізія кнопок Drip Castle</title>
+<meta name="description" content="Анкета для тестувальників Drip Castle: як часто ви тиснули кожну кнопку старого інтерфейсу і де їй місце.">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light dark">
+<style>
+  /* Мінімальний скид - те саме, що дає платформа артефактів, щоб сторінка
+     виглядала однаково і тут, і там. */
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+  /* Палітра взята з самої гри: це не нова тема, а ті самі токени, що й у HUD.
+     Пісок #E8DCC0 - колір натиснутої кнопки в грі (GameHud.activeButton),
+     чорнило #231B12 - InkSheet, лінія #DECFB8 - LineSheet, глина #B84233 -
+     dangerButton. Вибрана пігулка в анкеті виглядає рівно як натиснута кнопка
+     в грі - щоб тестувальник не перемикався між двома мовами кольору. */
+  :root {
+    --ground: #F4EBD8;
+    --paper:  #FFFCF5;
+    --raise:  #FBF5E8;
+    --ink:    #231B12;
+    --sub:    #584A37;
+    --muted:  #8A7758;
+    --line:   #DECFB8;
+    --line-2: #C9B694;
+    --sand:   #E8DCC0;
+    --amber:  #B07A16;
+    --amber-soft: #F0E2BE;
+    --clay:   #A93B2C;
+    --clay-soft: #F3DED8;
+    --shadow: 0 1px 0 rgba(35,27,18,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #15110B;
+      --paper:  #211A11;
+      --raise:  #2A2116;
+      --ink:    #F2E8D6;
+      --sub:    #BCA988;
+      --muted:  #8D7B5D;
+      --line:   #3A3024;
+      --line-2: #4C3F2C;
+      --sand:   #C9B086;
+      --amber:  #EBC26B;
+      --amber-soft: #3A2E17;
+      --clay:   #E08471;
+      --clay-soft: #3C2019;
+      --shadow: 0 1px 0 rgba(0,0,0,.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #15110B;
+    --paper:  #211A11;
+    --raise:  #2A2116;
+    --ink:    #F2E8D6;
+    --sub:    #BCA988;
+    --muted:  #8D7B5D;
+    --line:   #3A3024;
+    --line-2: #4C3F2C;
+    --sand:   #C9B086;
+    --amber:  #EBC26B;
+    --amber-soft: #3A2E17;
+    --clay:   #E08471;
+    --clay-soft: #3C2019;
+    --shadow: 0 1px 0 rgba(0,0,0,.25);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: Geist, "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding-inline: 20px;
+    padding-block: 0 72px;
+  }
+
+  /* ── лічильник, що їде з тобою ─────────────────────────────────── */
+  .meter {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--ground);
+    background: color-mix(in srgb, var(--ground) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+    margin-inline: -20px;
+    padding: 10px 20px 9px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .meter-track {
+    flex: 1;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .meter-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: var(--amber);
+    transition: width .28s cubic-bezier(.23,1,.32,1);
+  }
+  .meter-count {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--sub);
+    white-space: nowrap;
+  }
+
+  /* ── шапка ─────────────────────────────────────────────────────── */
+  header { padding-block: 40px 8px; }
+  .eyebrow {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: clamp(30px, 7vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -.022em;
+    font-weight: 700;
+    margin: 10px 0 0;
+    text-wrap: balance;
+  }
+  .lede {
+    max-width: 62ch;
+    color: var(--sub);
+    font-size: 16px;
+    margin: 18px 0 0;
+  }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  .legend {
+    margin-top: 26px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--paper);
+    padding: 18px 20px;
+    display: grid;
+    gap: 16px;
+  }
+  .legend h2 {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .legend dl { margin: 0; display: grid; gap: 5px; }
+  .legend dt {
+    font-weight: 600;
+    font-size: 13.5px;
+    display: inline;
+  }
+  .legend dd {
+    margin: 0 0 2px;
+    color: var(--sub);
+    font-size: 13.5px;
+  }
+  .legend dd::before { content: "— "; color: var(--muted); }
+
+  /* ── розділи ───────────────────────────────────────────────────── */
+  section { margin-top: 44px; }
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--line-2);
+  }
+  .sec-head h2 {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -.012em;
+    margin: 0;
+  }
+  .sec-head .tally {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .sec-note {
+    color: var(--sub);
+    font-size: 13.5px;
+    margin: 10px 0 0;
+    max-width: 62ch;
+  }
+
+  /* ── рядок кнопки ──────────────────────────────────────────────── */
+  .ctl {
+    border-bottom: 1px solid var(--line);
+    padding-block: 18px;
+    display: grid;
+    gap: 14px;
+  }
+  .ctl:last-of-type { border-bottom: 0; }
+  .ctl.done .name { color: var(--ink); }
+
+  .ctl-head { display: grid; gap: 3px; }
+  .name {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    color: var(--ink);
+  }
+  .what { color: var(--sub); font-size: 13.5px; }
+
+  .qs { display: grid; gap: 12px; }
+  .q { display: grid; gap: 7px; }
+  .q-label {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .pill {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sub);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 13px;
+    cursor: pointer;
+    transition: background .12s ease, border-color .12s ease, color .12s ease;
+  }
+  .pill:hover { border-color: var(--line-2); color: var(--ink); }
+  .pill:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 2px;
+  }
+  /* Вибрана пігулка = натиснута кнопка в грі: пісок і темне чорнило. */
+  .pill[aria-pressed="true"] {
+    background: var(--sand);
+    border-color: var(--sand);
+    color: #231B12;
+    font-weight: 600;
+  }
+  .pill[aria-pressed="true"].is-never {
+    background: var(--clay-soft);
+    border-color: var(--clay);
+    color: var(--clay);
+  }
+  .pill[aria-pressed="true"].is-unseen {
+    background: var(--amber-soft);
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+
+  /* ── текстові поля ─────────────────────────────────────────────── */
+  .field { display: grid; gap: 7px; margin-top: 18px; }
+  .field > label {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  input[type="text"], textarea {
+    font: inherit;
+    font-size: 14.5px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    width: 100%;
+    resize: vertical;
+  }
+  input[type="text"]:focus, textarea:focus {
+    outline: 2px solid var(--amber);
+    outline-offset: 1px;
+    border-color: var(--amber);
+  }
+  textarea { min-height: 78px; line-height: 1.5; }
+  .hint { color: var(--muted); font-size: 12.5px; }
+
+  /* ── кінцівка ──────────────────────────────────────────────────── */
+  .finish {
+    margin-top: 40px;
+    border: 1px solid var(--line-2);
+    border-radius: 14px;
+    background: var(--raise);
+    padding: 22px 22px 24px;
+  }
+  .finish h2 { font-size: 19px; font-weight: 600; margin: 0; letter-spacing: -.012em; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; align-items: center; }
+  .btn {
+    font: inherit;
+    font-size: 14.5px;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 11px 20px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: filter .12s ease;
+  }
+  .btn:hover { filter: brightness(.96); }
+  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .btn-primary { background: var(--amber); color: var(--ground); border-color: var(--amber); }
+  .btn-quiet { background: var(--paper); color: var(--ink); border-color: var(--line-2); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; filter: none; }
+
+  .status { font-size: 13.5px; color: var(--sub); margin-top: 14px; }
+  .status.bad { color: var(--clay); }
+  .status.good { color: var(--ink); font-weight: 500; }
+
+  #dump { margin-top: 16px; }
+  #dump textarea {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 12px;
+    min-height: 220px;
+  }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+
+  @media (max-width: 430px) {
+    .pill { padding: 7px 11px; font-size: 12.5px; }
+    .sec-head { flex-wrap: wrap; }
+    .sec-head .tally { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div class="meter">
+    <div class="meter-track"><div class="meter-fill" id="fill"></div></div>
+    <div class="meter-count" id="count">0 / 0</div>
+  </div>
+
+  <header>
+    <div class="eyebrow">Тест перед релізом · старий інтерфейс</div>
+    <h1>Ревізія кнопок Drip Castle</h1>
+    <p class="lede">Новий інтерфейс уміщає менше кнопок, ніж є зараз, — і вирішити,
+      що лишити на екрані, має той, хто грає, а не той, хто малює. Тут
+      <strong>24 кнопки й повзунок</strong> старої гри — ті, доля яких справді
+      відкрита.</p>
+    <p class="lede">Головне питання одне: <strong>як часто ви це тиснули</strong>.
+      Друге, про місце на екрані, стоїть лише в п'яти кнопок, які видно завжди —
+      решті вибирати нема з чого.</p>
+    <p class="lede">Заповнюйте <strong>після того, як пограли</strong> — хоча б пів
+      години. Відповіді зберігаються у браузері самі, тож можна закрити й
+      повернутися. Приблизно чотири хвилини.</p>
+
+    <div class="legend">
+      <div>
+        <h2>Як часто</h2>
+        <dl>
+          <dt>Щоразу</dt><dd>тиснув у кожному сеансі, часто</dd>
+          <dt>Часто</dt><dd>кілька разів за сеанс</dd>
+          <dt>Інколи</dt><dd>не щоразу, але сам згадував про неї</dd>
+          <dt>Раз-два</dt><dd>спробував і забув</dd>
+          <dt>Ніколи</dt><dd>знав, що вона є, і не тиснув</dd>
+          <dt>Не бачив</dt><dd>не помітив, що така кнопка існує</dd>
+        </dl>
+      </div>
+      <div>
+        <h2>Де їй місце · лише розділ «Завжди на екрані»</h2>
+        <dl>
+          <dt>На екрані</dt><dd>має бути під рукою, без заходу в меню</dd>
+          <dt>У меню</dt><dd>потрібна, але не щохвилини — нехай буде глибше</dd>
+          <dt>Не треба</dt><dd>гра не постраждає, якщо її прибрати зовсім</dd>
+        </dl>
+      </div>
+    </div>
+  </header>
+
+  <main id="form"></main>
+
+  <div class="finish">
+    <h2>Наостанок</h2>
+
+    <div class="field">
+      <label for="who">Хто відповідає</label>
+      <input type="text" id="who" placeholder="Ім'я або нікнейм">
+    </div>
+
+    <div class="field">
+      <label for="device">Телефон і як довго грали</label>
+      <input type="text" id="device" placeholder="Напр.: Redmi Note 12, дві години за три вечори">
+    </div>
+
+    <div class="field">
+      <label for="missing">Кнопка, якої немає, а потрібна</label>
+      <textarea id="missing" placeholder="Що ви шукали на екрані й не знайшли?"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="confusing">Що плутає найбільше</label>
+      <textarea id="confusing" placeholder="Кнопка, яка робить не те, чого ви від неї чекали."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="extra">Будь-що інше</label>
+      <textarea id="extra" placeholder="Не обов'язково."></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="copy">Скопіювати відповіді</button>
+      <button class="btn btn-quiet" id="reset">Почати заново</button>
+    </div>
+    <p class="status" id="status"></p>
+
+    <div id="dump" hidden>
+      <p class="hint">Ось ваші відповіді одним текстом. Надішліть його розробникові
+        будь-яким звичним способом — сторінка нікуди їх сама не відправляє.</p>
+      <textarea id="dumpText" readonly></textarea>
+    </div>
+  </div>
+
+  <footer>
+    Перелік складено з самої сцени гри, а не з пам'яті. Зі 38 елементів, які можна
+    натиснути або потягнути, тут лишилися 25: смугу інструментів, меню, велику
+    кнопку дії та «Закрити» прибрано — вони лишаються в грі за будь-якого
+    оформлення, тож питати про них нема про що. Підписи кнопок подано так, як вони
+    стоять у грі.
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* Перелік знято з SampleScene.unity через редактор: усе, на чому є Button,
+     Slider або HoldButton. Вимкнений `Tool_ТУНЕЛЬ` (залишок) не входить -
+     на екрані його немає. П'ятнадцять кнопок мов зведено в один рядок
+     «Мова»: питання не про естонську проти польської, а про сам перемикач. */
+  /* Перелік знято з SampleScene.unity через редактор: усе, на чому є Button,
+     Slider або HoldButton. Далі його врізано за рішенням розробника - зі
+     скороченого списку питати нема про що: три кнопки родин, меню й велика
+     кнопка дії лишаються в грі за будь-якого оформлення.
+
+     `askNeed` - чи питати «де їй місце». Там, де вибору немає (рядок списку
+     живе в списку за визначенням, повзунок - на екрані, питання при виході
+     з'являється саме тоді, коли виходиш), питання зводилося б до вгадування. */
+  var GROUPS = [
+    {
+      key: "always",
+      title: "Завжди на екрані",
+      note: "Чотири кнопки з підписами плюс одна, що з'являється лише коли ви сидите в шезлонгу.",
+      askNeed: true,
+      items: [
+        { id: "menu",   name: "МЕНЮ",       what: "відкриває налаштування зі світами, мовою і рештою" },
+        { id: "camera", name: "КАМЕРА",     what: "повертає вигляд у початкове положення" },
+        { id: "undo",   name: "СКАСУВАТИ",  what: "відкочує останню дію; пригасає, коли скасовувати нічого" },
+        { id: "sky",    name: "ПОЛУДЕНЬ / ЗАХІД / НІЧ", what: "перемикає час доби по колу; підпис показує поточне небо" },
+        { id: "dim",    name: "ЯСКРАВІСТЬ",  what: "притемнює екран; видно тільки сидячи в шезлонгу" }
+      ]
+    },
+    {
+      key: "pour",
+      title: "Список під «ЛИТИ»",
+      note: "П'ять рядків. Перший - вільне сипання, решта - готові форми.",
+      askNeed: false,
+      items: [
+        { id: "pour_free", name: "ЛИТИ",     what: "сипати пісок вільно, без форми" },
+        { id: "pour_col",  name: "СТОВП",    what: "ставить стовп" },
+        { id: "pour_cyl",  name: "ЦИЛІНДР",  what: "ставить циліндр" },
+        { id: "pour_cone", name: "КОНУС",    what: "ставить конус" },
+        { id: "pour_pyr",  name: "ПІРАМІДА", what: "ставить піраміду" }
+      ]
+    },
+    {
+      key: "dig",
+      title: "Список під «КОПАТИ»",
+      note: "Чотири рядки.",
+      askNeed: false,
+      items: [
+        { id: "dig_free", name: "КОПАТИ",     what: "вигрібати пісок вільно" },
+        { id: "dig_tun",  name: "ТУНЕЛЬ",     what: "круглий прохід наскрізь" },
+        { id: "dig_sq",   name: "КВ. ТУНЕЛЬ", what: "квадратний прохід наскрізь" },
+        { id: "dig_slice",name: "ЗРІЗ",       what: "зрізає все вище площини" }
+      ]
+    },
+    {
+      key: "props",
+      title: "Список під «ДЕРЕВО»",
+      note: "Шість рядків: п'ять речей і режим прибирання.",
+      askNeed: false,
+      items: [
+        { id: "prop_tree",  name: "ДЕРЕВО",   what: "садить дерево" },
+        { id: "prop_lng",   name: "ШЕЗЛОНГ",  what: "ставить шезлонг, у який можна сісти" },
+        { id: "prop_par",   name: "ПАРАСОЛЯ", what: "ставить парасолю" },
+        { id: "prop_shell", name: "МУШЛЯ",    what: "кладе мушлю" },
+        { id: "prop_star",  name: "ЗІРКА",    what: "кладе морську зірку" },
+        { id: "prop_rm",    name: "ПРИБРАТИ", what: "режим, у якому натиск прибирає поставлену річ" }
+      ]
+    },
+    {
+      key: "hands",
+      title: "Керування в руках",
+      note: "Єдине в грі, що не натискається, а тягнеться.",
+      askNeed: false,
+      items: [
+        { id: "radius", name: "ПОВЗУНОК РОЗМІРУ", what: "товщина струмка й ширина ями" }
+      ]
+    },
+    {
+      key: "exit",
+      title: "Питання при виході",
+      note: "З'являється на кнопку «назад» телефона.",
+      askNeed: false,
+      items: [
+        { id: "x_save",   name: "ЗБЕРЕГТИ І ВИЙТИ", what: "записує пляж і закриває гру" },
+        { id: "x_quit",   name: "ВИЙТИ",            what: "закриває гру" },
+        { id: "x_cancel", name: "СКАСУВАТИ",        what: "лишає вас у грі" }
+      ]
+    }
+  ];
+
+  var FREQ = [
+    { v: "always",    t: "Щоразу" },
+    { v: "often",     t: "Часто" },
+    { v: "sometimes", t: "Інколи" },
+    { v: "onceTwice", t: "Раз-два" },
+    { v: "never",     t: "Ніколи", cls: "is-never" },
+    { v: "unseen",    t: "Не бачив", cls: "is-unseen" }
+  ];
+
+  var NEED = [
+    { v: "screen", t: "На екрані" },
+    { v: "menu",   t: "У меню" },
+    { v: "drop",   t: "Не треба", cls: "is-never" }
+  ];
+
+  var TEXT_FIELDS = ["who", "device", "missing", "confusing", "extra"];
+  var STORE = "dripcastle.hud.survey.v1";
+
+  var answers = {};
+  var texts = {};
+  var total = 0;
+  GROUPS.forEach(function (g) { total += g.items.length * (g.askNeed ? 2 : 1); });
+
+  function perItem(g) { return g.askNeed ? 2 : 1; }
+
+  /* ── пам'ять браузера. Може бути закрита (приватне вікно) - тоді анкета
+        просто працює без чернетки, а не ламається. ─────────────────── */
+  function save() {
+    try {
+      localStorage.setItem(STORE, JSON.stringify({ answers: answers, texts: texts }));
+    } catch (e) { /* нічого: чернетка - зручність, не вимога */ }
+  }
+  function restore() {
+    try {
+      var raw = localStorage.getItem(STORE);
+      if (!raw) return;
+      var got = JSON.parse(raw);
+      if (got && typeof got === "object") {
+        answers = got.answers && typeof got.answers === "object" ? got.answers : {};
+        texts = got.texts && typeof got.texts === "object" ? got.texts : {};
+      }
+    } catch (e) { answers = {}; texts = {}; }
+  }
+
+  restore();
+
+  /* ── побудова ──────────────────────────────────────────────────── */
+  var form = document.getElementById("form");
+
+  function pillRow(itemId, kind, options, labelText) {
+    var q = document.createElement("div");
+    q.className = "q";
+
+    var lab = document.createElement("div");
+    lab.className = "q-label";
+    lab.id = "lab-" + itemId + "-" + kind;
+    lab.textContent = labelText;
+    q.appendChild(lab);
+
+    var box = document.createElement("div");
+    box.className = "pills";
+    box.setAttribute("role", "group");
+    box.setAttribute("aria-labelledby", lab.id);
+
+    options.forEach(function (opt) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "pill" + (opt.cls ? " " + opt.cls : "");
+      b.id = "p-" + itemId + "-" + kind + "-" + opt.v;
+      b.textContent = opt.t;
+      b.setAttribute("aria-pressed", "false");
+      b.addEventListener("click", function () {
+        var key = itemId + "." + kind;
+        if (answers[key] === opt.v) delete answers[key];
+        else answers[key] = opt.v;
+        paint(box, itemId, kind);
+        save();
+        tick();
+      });
+      box.appendChild(b);
+    });
+
+    q.appendChild(box);
+    paint(box, itemId, kind);
+    return q;
+  }
+
+  function paint(box, itemId, kind) {
+    var chosen = answers[itemId + "." + kind];
+    var kids = box.querySelectorAll(".pill");
+    for (var i = 0; i < kids.length; i++) {
+      var v = kids[i].id.split("-").pop();
+      kids[i].setAttribute("aria-pressed", v === chosen ? "true" : "false");
+    }
+  }
+
+  GROUPS.forEach(function (g) {
+    var sec = document.createElement("section");
+    sec.id = "sec-" + g.key;
+
+    var head = document.createElement("div");
+    head.className = "sec-head";
+    var h2 = document.createElement("h2");
+    h2.textContent = g.title;
+    head.appendChild(h2);
+    var tally = document.createElement("div");
+    tally.className = "tally";
+    tally.id = "tally-" + g.key;
+    head.appendChild(tally);
+    sec.appendChild(head);
+
+    if (g.note) {
+      var note = document.createElement("p");
+      note.className = "sec-note";
+      note.textContent = g.note;
+      sec.appendChild(note);
+    }
+
+    g.items.forEach(function (item) {
+      var row = document.createElement("div");
+      row.className = "ctl";
+      row.id = "ctl-" + item.id;
+
+      var ch = document.createElement("div");
+      ch.className = "ctl-head";
+      var nm = document.createElement("div");
+      nm.className = "name";
+      nm.textContent = item.name;
+      ch.appendChild(nm);
+      var wh = document.createElement("div");
+      wh.className = "what";
+      wh.textContent = item.what;
+      ch.appendChild(wh);
+      row.appendChild(ch);
+
+      var qs = document.createElement("div");
+      qs.className = "qs";
+      qs.appendChild(pillRow(item.id, "freq", FREQ, "Як часто"));
+      if (g.askNeed) qs.appendChild(pillRow(item.id, "need", NEED, "Де їй місце"));
+      row.appendChild(qs);
+
+      sec.appendChild(row);
+    });
+
+    form.appendChild(sec);
+  });
+
+  /* ── текстові поля ─────────────────────────────────────────────── */
+  TEXT_FIELDS.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (texts[id]) el.value = texts[id];
+    el.addEventListener("input", function () {
+      texts[id] = el.value;
+      save();
+    });
+  });
+
+  /* ── лічильник ─────────────────────────────────────────────────── */
+  var fill = document.getElementById("fill");
+  var count = document.getElementById("count");
+
+  function tick() {
+    var done = 0;
+    GROUPS.forEach(function (g) {
+      var want = perItem(g);
+      var gd = 0;
+      g.items.forEach(function (item) {
+        var a = answers[item.id + ".freq"] ? 1 : 0;
+        var b = g.askNeed && answers[item.id + ".need"] ? 1 : 0;
+        gd += a + b;
+        var row = document.getElementById("ctl-" + item.id);
+        if (row) row.classList.toggle("done", a + b === want);
+      });
+      done += gd;
+      var t = document.getElementById("tally-" + g.key);
+      if (t) t.textContent = gd + " / " + (g.items.length * want);
+    });
+    count.textContent = done + " / " + total;
+    fill.style.width = (total ? (done / total) * 100 : 0) + "%";
+    return done;
+  }
+
+  tick();
+
+  /* ── звіт словами ──────────────────────────────────────────────── */
+  function labelOf(list, v) {
+    for (var i = 0; i < list.length; i++) if (list[i].v === v) return list[i].t;
+    return "—";
+  }
+
+  function asText() {
+    var out = [];
+    out.push("РЕВІЗІЯ КНОПОК DRIP CASTLE");
+    out.push("хто: " + (texts.who || "—"));
+    out.push("телефон і час: " + (texts.device || "—"));
+    out.push("заповнено: " + tick() + " з " + total);
+    out.push("");
+    GROUPS.forEach(function (g) {
+      out.push("[" + g.title.toUpperCase() + "]");
+      g.items.forEach(function (item) {
+        var line = "  " + item.name + "  ·  як часто: " + labelOf(FREQ, answers[item.id + ".freq"]);
+        if (g.askNeed) line += "  ·  місце: " + labelOf(NEED, answers[item.id + ".need"]);
+        out.push(line);
+      });
+      out.push("");
+    });
+    out.push("КНОПКА, ЯКОЇ НЕМАЄ:");
+    out.push("  " + (texts.missing || "—"));
+    out.push("ЩО ПЛУТАЄ:");
+    out.push("  " + (texts.confusing || "—"));
+    out.push("ІНШЕ:");
+    out.push("  " + (texts.extra || "—"));
+    return out.join("\n");
+  }
+
+  /* ── зворотний шлях ────────────────────────────────────────────────── */
+  var statusEl = document.getElementById("status");
+  var copyBtn = document.getElementById("copy");
+  var resetBtn = document.getElementById("reset");
+  var dump = document.getElementById("dump");
+  var dumpText = document.getElementById("dumpText");
+
+  function say(msg, cls) {
+    statusEl.textContent = msg;
+    statusEl.className = "status" + (cls ? " " + cls : "");
+  }
+
+  /* Єдиний шлях назад: текст у буфері. Сторінка лежить на GitHub Pages, без
+     жодного сервера за спиною - і це навмисно, бо так її відкриє будь-хто без
+     реєстрації. Буфер може бути закритий (старий браузер, відмова в дозволі),
+     тому текст завжди ще й показується поруч для ручного виділення. */
+  copyBtn.addEventListener("click", function () {
+    var done = tick();
+    var text = asText();
+    dumpText.value = text;
+    dump.hidden = false;
+    var tail = done < total ? " Відмічено " + done + " з " + total + " — можна надсилати й так." : "";
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say("Скопійовано." + tail, "good");
+      }).catch(function () {
+        say("Скопіювати автоматично не вийшло — виділіть текст нижче вручну." + tail, "bad");
+      });
+    } else {
+      say("Виділіть текст нижче й скопіюйте вручну." + tail);
+    }
+  });
+
+  resetBtn.addEventListener("click", function () {
+    if (!window.confirm("Стерти всі відповіді й почати заново?")) return;
+    answers = {};
+    texts = {};
+    save();
+    TEXT_FIELDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+    document.querySelectorAll(".pills").forEach(function (box) {
+      var kids = box.querySelectorAll(".pill");
+      for (var i = 0; i < kids.length; i++) kids[i].setAttribute("aria-pressed", "false");
+    });
+    dump.hidden = true;
+    say("Порожньо.");
+    tick();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+})();
+</script>
+
+</body>
+</html>
