@@ -16,31 +16,69 @@
 <body>
 
 <h1>Privacy Policy for Drip Castle</h1>
-<p class="meta">Last updated: 24 September 2026</p>
+<p class="meta">Last updated: 21 October 2026</p>
 
 <p>This policy explains how the Android game <strong>Drip Castle</strong>
 (package <code>com.tidepoollab.dripcastle</code>), published by
 <strong>Tide Pool Lab</strong>, handles your information.</p>
 
 <h2>Short version</h2>
-<p>Drip Castle does not collect, transmit or share any personal data. It has no
-user accounts, no analytics and no advertising. The game itself does not connect
-to the internet; the optional purchase described below is handled by the Google
-Play Store app, not by the game.</p>
+<p>Drip Castle has no user accounts and no analytics, and we receive no personal data
+from it. The free version shows an occasional full-screen ad from <strong>Google
+AdMob</strong>. Because the game is made for children, every ad request is marked as
+directed to children: the ads are not personalised, there is no remarketing, and the
+game does not use the Android advertising identifier. Buying the full version removes
+the ads. Your castles never leave your device.</p>
 
 <h2>Data we collect</h2>
-<p><strong>None.</strong> The app requests no permissions that would allow it to
-read your contacts, location, camera, microphone, files or device identifiers.
-The application does not hold the Android <code>INTERNET</code> permission, so it
-cannot send information anywhere even in principle. The only permissions it holds
-are <code>com.android.vending.BILLING</code>, which lets the Google Play Store app
-offer you the purchase described below, and <code>ACCESS_NETWORK_STATE</code>,
-which reports whether the device is online.</p>
+<p><strong>None.</strong> Nothing the game does is sent to us, and we have no server
+that could receive it. The game cannot read your contacts, location, camera,
+microphone or files, and it does not hold the permission Android requires to read the
+advertising identifier (<code>com.google.android.gms.permission.AD_ID</code>).</p>
+<p>The permissions the game holds are: <code>INTERNET</code>, which the ads need;
+<code>ACCESS_NETWORK_STATE</code>, which reports whether the device is online;
+<code>com.android.vending.BILLING</code>, which lets the Google Play Store app offer
+the purchase described below; and <code>WAKE_LOCK</code> and
+<code>FOREGROUND_SERVICE</code>, used by a standard Android component that Google's
+ad library relies on to schedule its network requests.</p>
 
 <h2>Data stored on your device</h2>
-<p>The game saves your castles and your settings to its own private storage on
-your device so you can return to them later. This data never leaves the device,
-is not readable by other apps, and is deleted when you uninstall the game.</p>
+<p>The game saves your castles and your settings to its own private storage on your
+device so you can return to them later. Next to them it keeps a few counters — how
+many times the game has been started, how many ads have been shown and when the last
+one was — so that ads stay rare. None of this leaves the device, it is not readable
+by other apps, and it is deleted when you uninstall the game.</p>
+
+<h2>Advertising</h2>
+<p><strong>Who serves the ads.</strong> Google AdMob, an ad network that takes part in
+Google Play's
+<a href="https://support.google.com/googleplay/android-developer/answer/9900633">Families
+Self-Certified Ads SDK Program</a>.</p>
+<p><strong>When.</strong> Only at natural breaks — after you clear the beach, after you
+save a new castle for the first time, or when you switch to another castle. Never
+while you are building, never in the first session, and never more often than once
+every few minutes.</p>
+<p><strong>How the ads are restricted.</strong> Every ad request is marked as directed
+to children and limited to content rated suitable for general audiences. Under that
+setting Google shows only non-personalised ads, uses no remarketing and does not send
+the advertising identifier.</p>
+<p><strong>What Google's ad library collects.</strong> To deliver an ad, count it and
+prevent fraud, Google's ad library collects your device's IP address (which can show
+a general location), your interactions with the ads (for example that an ad was shown
+or tapped), diagnostic information about the ad library's performance, and the app
+set ID — an identifier Android gives to apps from one publisher on one device, which
+is not the advertising identifier. This data is encrypted in transit and goes to
+Google, not to us. Google handles it under the
+<a href="https://policies.google.com/privacy">Google Privacy Policy</a>; see also
+<a href="https://policies.google.com/technologies/partner-sites">how Google uses
+information from apps that use its services</a>.</p>
+<p><strong>Consent in the EEA, the UK and Switzerland.</strong> The game uses Google's
+consent tool. Because every player is treated as a child, it does not ask for consent
+to personalised ads — there are none. If Google ever does show you its consent
+message, you can change your choice at any time from the game's
+<em>Settings → Privacy</em>.</p>
+<p><strong>Removing the ads.</strong> The full version, bought once through Google
+Play, removes all ads.</p>
 
 <h2>In-app purchases</h2>
 <p>Drip Castle offers one optional purchase that unlocks the full version of the
@@ -51,14 +89,16 @@ screen belongs to us.</p>
 the purchase — which product was bought and a token that identifies the order. It
 keeps that on your device, in the same private storage as your castles, and asks
 Google Play for it again when you reinstall the game so that your purchase is
-restored. This information is not sent to us or to anyone else.</p>
+restored. This information is not sent to us.</p>
 <p>Your purchase history is held by Google under the
 <a href="https://policies.google.com/privacy">Google Privacy Policy</a>. Refunds and
 payment questions are handled by Google Play.</p>
 
 <h2>Third parties</h2>
-<p>The game contains no advertising networks, no analytics SDKs and no social
-media integrations. No data is shared with anyone.</p>
+<p>The only third party that receives data from the game is Google — through AdMob as
+described above, and through Google Play for the purchase. The game contains no
+analytics SDKs and no social media integrations. Unity, the engine the game is built
+with, is configured not to send usage statistics.</p>
 
 <h2>Children</h2>
 <p><strong>Drip Castle is made for children as well as adults.</strong> It is rated
@@ -67,13 +107,14 @@ it follows Google Play's <a
 href="https://support.google.com/googleplay/android-developer/answer/9893335">Families
 policy</a>.</p>
 <p><strong>We collect no personal information from children, because we collect none
-from anyone.</strong> There are no accounts to create, no name or email to enter, no
-analytics, and no advertising identifier is read or used. Nothing a child does in the
-game is transmitted anywhere, so there is nothing for us to store, share or sell, and
-no data for a parent to request or have deleted — we hold none.</p>
-<p>The game contains no advertising, no links out to other apps or websites, and no
-social features or chat. The one purchase it offers is made through Google Play, and
-a parent can require approval for every purchase using
+from anyone.</strong> There are no accounts to create and no name or email to enter.
+The game treats every player as a child: its ads are child-directed and
+non-personalised, and it does not use the advertising identifier. The data Google's
+ad library collects is listed under <em>Advertising</em> above; it goes to Google, not
+to us.</p>
+<p>Apart from the ads, the game has no links out to other apps or websites, and no
+social features or chat. A parent can remove the ads by buying the full version, and
+can require approval for every purchase using
 <a href="https://families.google/familylink/">Google Family Link</a>; the game shows
 the purchase as awaiting approval until the parent decides.</p>
 <p>If you are a parent and have a question about this game, write to us at the address
@@ -86,14 +127,12 @@ Google, not by us, and is governed by the
 <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
 
 <h2>Changes to this policy</h2>
-<p>If a future version of the game adds features that handle data — for example
-advertising — this policy will be updated before that version is released, and the
-change will be reflected in the app's Data Safety information on Google Play. Because
-this is a game for children, any advertising it ever carries will come from an ad
-network certified for families, will not be personalised, and will not use an
-advertising identifier.</p>
-<p>The in-app purchase described above arrived in version 0.8.2. This policy was
-updated for it, and for the children's audience, on 24 September 2026.</p>
+<p>If a future version of the game changes how it handles data, this policy will be
+updated before that version is released, and the change will be reflected in the
+app's Data Safety information on Google Play.</p>
+<p>This policy was updated on 21 October 2026 for the version of the game that
+introduces advertising. The previous version, of 24 September 2026, covered the
+in-app purchase and the children's audience.</p>
 
 <h2>Contact</h2>
 <p>Questions about this policy: <a href="mailto:tidepool.lab@gmail.com">tidepool.lab@gmail.com</a></p>
